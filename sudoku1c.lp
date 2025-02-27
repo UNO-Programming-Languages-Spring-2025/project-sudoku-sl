@@ -5,21 +5,30 @@
 % A cell (x,y) can be mapped to the subgrid labeled 1+(((x-1)/n)*n+(y-1)/n)
 
 % Your implementation please...
-num(1..4).
-pos(1..4).
+numbers(N) :- N = 1..4.
+subgrid_positions(P) :- P = 1..4.
+
+validCells(X,Y,N) :- subgrid_positions(X), subgrid_positions(Y), numbers(N).
+1 { cellValue(X,Y,N) : numbers(N) } 1 :- subgrid_positions(X), subgrid_positions(Y).
+
+cellValue(X,Y,N) :- initial(X,Y,N).
+
+in_row(X,N) :- cellValue(X,Y,N), subgrid_positions(Y).
+:- numbers(N), subgrid_positions(X), not in_row(X,N).
+in_col(Y,N) :- cellValue(X,Y,N), subgrid_positions(X).
+:- numbers(N), subgrid_positions(Y), not in_col(Y,N).
 
 
-1 { sudoku(X,Y,N) : num(N) } 1 :- pos(X), pos(Y).
-:- pos(Y), num(N), not 1 { sudoku(X,Y,N) } 1.
-:- pos(X), num(N), not 1 { sudoku(X,Y,N) } 1.
-sudoku(X,Y,N) :- initial(X,Y,N).
+subgrid(X,Y,1) :- subgrid_positions(X), subgrid_positions(Y), X <= 2, Y <= 2.
+subgrid(X,Y,2) :- subgrid_positions(X), subgrid_positions(Y), X <= 2, Y > 2.
+subgrid(X,Y,3) :- subgrid_positions(X), subgrid_positions(Y), X > 2, Y <= 2.
+subgrid(X,Y,4) :- subgrid_positions(X), subgrid_positions(Y), X > 2, Y > 2.
 
 
-subgrid(X,Y,1) :- pos(X), pos(Y), X <= 2, Y <= 2.
-subgrid(X,Y,2) :- pos(X), pos(Y), X <= 2, Y > 2.
-subgrid(X,Y,3) :- pos(X), pos(Y), X > 2, Y <= 2.
-subgrid(X,Y,4) :- pos(X), pos(Y), X > 2, Y > 2.
-:- num(N), subgrid(_,_,G), not 1 { sudoku(X,Y,N) : subgrid(X,Y,G) } 1.
+inSubgrid(G,N) :- cellValue(X,Y,N), subgrid(X,Y,G).
+:- numbers(N), G = 1..4, not inSubgrid(G,N).
+
+sudoku(X,Y,N) :- cellValue(X,Y,N).
 
 #show sudoku/3.
 
